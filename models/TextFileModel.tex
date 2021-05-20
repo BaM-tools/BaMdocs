@@ -1,0 +1,129 @@
+\documentclass[a4paper]{article}
+\usepackage[utf8]{inputenc}
+\usepackage{tcolorbox}
+\usepackage{courier}
+\usepackage[margin=1in]{geometry}
+\usepackage{amsmath}
+\usepackage{hyperref}
+
+\title{Text File Model: define your own model as a simple text formula}
+\author{Author(s) of this sheet: Benjamin Renard}
+\date{Last update: March 2020}
+
+\begin{document}
+
+\maketitle
+
+\section{General description}
+This pseudo-model provides an interface to define any model that is simple enough to be written as a one-line text formula (or several one-line formulas if there are several output variables).
+
+\section{Key properties}
+
+\begin{description}
+\item[ID] \texttt{"TextFile"}.
+
+\item[Input Variables]  any number $N_X \geq0$ is allowed.
+
+\item[Output Variables]  any number $N_Y \geq1$ is allowed.
+
+\item[Parameters] any number $N_{par} \geq0$ is allowed.
+
+\item[Derived parameters] $N_{d}=0$ - this utility is not available for this model.
+
+\item[State variables] $N_{Z}=0$ - this utility is not available for this model.
+
+\item[Xtra information] The model is defined using the Xtra-information configuration file (the one declared in the fourth row of Config\_BaM.txt). This file should contain the following lines: 
+\begin{enumerate}
+\item The number of input variables $N_X$; ex.: \texttt{3}.
+\item The names of all input variables, comma-separated; ex.: \texttt{A, B, C}.
+\item The number of parameters $N_{par}$; ex.: \texttt{4}.
+\item The names of all parameters, comma-separated; ex.: \texttt{par1, par2, par3, par4}.
+\item The number of output variables $N_Y$; ex.: \texttt{2}.
+\item The formula to compute the first output; ex: \texttt{par1+par2*exp(-1*par3*A*B)}.
+\item $\dots$
+\item The formula to compute the $N_Y^{th}$ output; ex: \texttt{A\^{}2*C\^{}par4}.
+\end{enumerate}
+\end{description}
+
+\section{Mathematical formulation}
+
+The formulas defining the model should be valid mathematical expressions that combine the following elements:
+
+\begin{enumerate}
+\item Operators \texttt{+}, \texttt{-}, \texttt{*}, \texttt{/}, \texttt{\^{}}; for the latter power operator, \texttt{**} is also accepted.
+\item Numbers (use the point as decimal separator).
+\item Input and parameter names.
+\item Brackets (only use round brackets: \texttt{()}).
+\item Standard mathematical functions. Currently available functions are:  \texttt{abs}, \texttt{exp}, \texttt{log10}, \texttt{log}, \texttt{sqrt}, \texttt{sin}, \texttt{cos}, \texttt{tan}, \texttt{asin}, \texttt{acos}, \texttt{atan}, \texttt{sinh}, \texttt{cosh}, \texttt{tanh}.
+\item indicator functions. Currently available functions are: \texttt{is0} ($is0(x)=1$ if $x=0$, $0$ otherwise), \texttt{ispos} ($ispos(x)=1$ if $x\geq0$, $0$ otherwise), \texttt{isneg} (same for negative),  \texttt{isspos} (same for strictly positive), \texttt{issneg} (same for strictly negative).
+\end{enumerate}
+
+The usual mathematical priority rules apply - when in doubt, use extra brackets. Please also consider the following tips to ensure formulas can be correctly interpreted and computed:
+
+\begin{itemize}
+\item Make sure there are no duplicates in input and parameter names.
+\item Make sure all variables used in formulas have been declared as either input or parameter names.
+\item Make sure all formulas are mathematically valid - in particular check brackets are balanced.
+\item use indicator functions to avoid mathematically-impossible computations. For instance if some input or parameter \texttt{x} can take negative values, the formula \texttt{sqrt(x)} may be problematic; a possible way around this is to use the formula \texttt{sqrt(ispos(x)*x)}.
+\item indicator functions can also be used to compute piecewise formulas. For instance:  \texttt{ispos(x)*x + issneg(x)*x\^{}2} returns $x$ if $x\geq0$ and $x^2$ if $x<0$.
+\item Do not use tabulations; use spaces instead if you want to format the formula to make it easier to read or indent the configuration file.
+\end{itemize}
+
+Finally, if you need a mathematical function that is not available yet, feel free to send a request to \href{mailto:bam.dev@lists.irstea.fr}{bam.dev@lists.irstea.fr}. Note however that only simple mathematical functions of a single variable can be added. For instance:
+
+\begin{itemize}
+\item the function $max(x,y)$ cannot be added - it is a function of two variables.
+\item the probability density function (pdf) of a standard normal distribution $\phi(x)$ can be added; however its parameterized version $\phi(x;\mu,\sigma)$ cannot.  
+\end{itemize}
+
+\section{Configuration in BaM}
+The example below shows an example of an Xtra-information configuration file to specify a population dynamics model. The model assumes that the population of a given species at time $t$ is equal to:
+
+%
+\begin{equation}
+P(t)=\frac{K}{1+\frac{K-p_0}{p_0}*exp(-r*T*t)}
+\label{eq:formula}
+\end{equation}
+%
+Where $p_0>0$ is the initial population, $K>p_0$ is the population upper limit (linked to environmental constraints), $T>0$ is the temperature time series (assumed to be always positive here) and $r$ is the growth-to-temperature ratio (i.e. the growth rate is equal to $r*T$ - the warmer the temperature, the larger the population growth). \\
+Assume that the same initial population $p_0$ of the same species (hence having the same $r$) is placed in two different environments (hence different upper limits $K_1$ and $K_2$ and different temperatures times series $T_1$ and $T_2$). The 2-output model specified in the Xtra-information configuration file below allows computing the evolution of both populations through time:\\
+
+\begin{tcolorbox}
+	\begin{tabular}{ll}
+		\texttt{3} & \texttt{! number of input variables}\\
+		\texttt{t,T1,T2} & \texttt{! time, Temp. site 1, Temp. site 2}\\
+		\texttt{4} & \texttt{! number of parameters}\\
+		\texttt{P0,r,K1,K2} & \texttt{! P0, r, limit site 1, limit site 2}\\
+		\texttt{2} & \texttt{! number of output variables}\\
+		\texttt{K1/(1+((K1-P0)/P0)*exp(-r*T1*t))} & \texttt{! P(t) at site 1}\\
+		\texttt{K2/(1+((K2-P0)/P0)*exp(-r*T2*t))} & \texttt{! P(t) at site 2}\\
+	\end{tabular}
+\end{tcolorbox}
+
+All other configuration files work as for any other model - you just need to make sure that they are consistent with the specifications above (number of inputs/outputs/parameters, name and order of parameters). For instance the model configuration file could be as follows:
+
+\begin{tcolorbox}
+	\begin{tabular}{ll}
+		\texttt{"TextFile"} & \texttt{! Model ID}\\
+		\texttt{3} & \texttt{! nX: number of input variables}\\
+		\texttt{2} & \texttt{! nY: number of ouput variables}\\
+		\texttt{4} & \texttt{! nPar: number of parameters theta}\\
+		\texttt{"P0"} & \texttt{! Parameter name}\\
+		\texttt{100} & \texttt{! Initial guess}\\
+		\texttt{"FIX"} & \texttt{! Prior distribution}\\
+		\texttt{} & \texttt{! Prior parameters}\\
+		\texttt{"r"} & \texttt{! Parameter name}\\
+		\texttt{0.001} & \texttt{! Initial guess}\\
+		\texttt{"LogNormal"} & \texttt{! Prior distribution}\\
+		\texttt{-7.0,1.0} & \texttt{! Prior parameters}\\
+		\texttt{"K1"} & \texttt{! Parameter name}\\
+		\texttt{10000} & \texttt{! Initial guess}\\
+		\texttt{"LogNormal"} & \texttt{! Prior distribution}\\
+		\texttt{9.0,1.0} & \texttt{! Prior parameters}\\
+		\texttt{"K2"} & \texttt{! Parameter name}\\
+		\texttt{10000} & \texttt{! Initial guess}\\
+		\texttt{"LogNormal"} & \texttt{! Prior distribution}\\
+		\texttt{9.0,1.0} & \texttt{! Prior parameters}\\	\end{tabular}
+\end{tcolorbox}
+
+\end{document}

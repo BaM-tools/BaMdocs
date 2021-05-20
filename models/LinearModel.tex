@@ -1,0 +1,109 @@
+\documentclass[a4paper]{article}
+\usepackage[utf8]{inputenc}
+\usepackage{tcolorbox}
+\usepackage{courier}
+\usepackage[margin=1in]{geometry}
+\usepackage{amsmath}
+\usepackage{hyperref}
+
+\title{Model: General Linear Model GLM}
+\author{Author(s) of this sheet: Benjamin Renard}
+\date{Last update: March 2019}
+
+\begin{document}
+
+\maketitle
+
+\section{General description}
+This model corresponds to the classical GLM approach used in statistics, a.k.a. multiple linear regression. It is a multivariate version of GLM (i.e. several output variables are allowed); however, the residuals will be considered as independent between each output variable (this is a current general restriction of BaM).\\
+WARNING: in the GLM context, linearity is \emph{with respect to parameters} (as opposed to input variables). For instance, the regression $y=\theta_0+\theta_1x+\theta_2x^2+\theta_3 cos(x)$ is a linear regression between the 4 input variables $\left( 1,x,x^2,cos(x) \right)$ and $y$. However, the regression $y=cos( \theta x)$ is not linear.
+
+\section{Key properties}
+
+\begin{description}
+\item[ID] \texttt{"Linear"}.
+
+\item[Input Variables] any number $N_X \geq1$ is allowed.
+
+\item[Output Variables] any number $N_Y \geq1$ is allowed
+
+\item[Parameters] $N_{par}=N_X N_Y$
+
+\item[Derived parameters] none, $N_{d}=0$
+
+\item[State variables] none, $N_{Z}=0$
+
+\item[Xtra information] none
+
+\end{description}
+
+\section{Mathematical formulation}
+The GLM model can be written in the following matrix form:
+%
+\begin{equation}
+\hat{\boldsymbol{y}}=\boldsymbol{x}\boldsymbol{\theta}
+\label{eq:GLM}
+\end{equation}
+%
+where $\boldsymbol{x}$ is the $N \times N_X$ matrix containing input variables (a.k.a. predictors or covariates), $\boldsymbol{\theta}$ is the parameter vector reorganized in a $N_X \times N_Y$ matrix, and $\hat{\boldsymbol{y}}$ is the $N \times N_Y$ matrix containing the predicted output variables (a.k.a. predictands).\\
+As an illustration, the most common situation is the GLM model for predicting $N_Y=1$ output variable using several predictors: 
+%
+\begin{equation}
+\hat{y}_i=\theta_0+\theta_1 x_{1,i}+\theta_2 x_{2,i}, \quad i=1, \dots ,N
+\label{eq:example}
+\end{equation}
+%
+This can be re-written in the matrix form of equation~(\ref{eq:GLM}) by posing:
+%
+\begin{equation}
+\hat{\boldsymbol{y}}=
+\begin{pmatrix}
+   \hat{y}_1 \\ \vdots \\ \hat{y}_N 
+\end{pmatrix}
+,\quad
+\boldsymbol{x}=
+\begin{pmatrix}
+  1 & x_{1,1} & x_{2,1} \\
+  \vdots & \vdots & \vdots \\
+  1 & x_{1,N} & x_{2,N}
+\end{pmatrix}
+,\quad
+\boldsymbol{\theta}=
+\begin{pmatrix}
+  \theta_0 \\ \theta_1 \\ \theta_2 
+\end{pmatrix}
+\label{eq:example2}
+\end{equation}
+
+\section{Configuration in BaM}
+The example below shows a configuration file for the model of equation~(\ref{eq:example}).\\
+%
+\begin{tcolorbox}
+	\begin{tabular}{ll}
+		\texttt{"Linear"} & \texttt{! Model ID}\\
+		\texttt{3} & \texttt{! nX: number of input variables}\\
+		\texttt{1} & \texttt{! nY: number of ouput variables}\\
+		\texttt{3} & \texttt{! nPar: number of parameters theta}\\
+		\texttt{"intercept"} & \texttt{! Parameter name}\\
+		\texttt{0.0} & \texttt{! Initial guess}\\
+		\texttt{"Gaussian"} & \texttt{! Prior distribution}\\
+		\texttt{0.0,1.0} & \texttt{! Prior parameters}\\
+		\texttt{"theta1"} & \texttt{! Parameter name}\\
+		\texttt{0.0} & \texttt{! Initial guess}\\
+		\texttt{"Gaussian"} & \texttt{! Prior distribution}\\
+		\texttt{0.0,0.2} & \texttt{! Prior parameters}\\
+		\texttt{"theta2"} & \texttt{! Parameter name}\\
+		\texttt{0} & \texttt{! Initial guess}\\
+		\texttt{"FlatPrior"} & \texttt{! Prior distribution}\\
+		\texttt{} & \texttt{! Prior parameters}\\
+	\end{tabular}
+\end{tcolorbox}
+
+\begin{thebibliography}{00}
+
+\bibitem[Doe et al. (2015)]{Doe2015}
+Doe, J, 2015. Paper Title. Journal name. doi:10.5194/hess-19-2427-2015.
+
+\end{thebibliography}
+
+\end{document}

@@ -1,0 +1,149 @@
+\documentclass[a4paper]{article}
+\usepackage[utf8]{inputenc}
+\usepackage{tcolorbox}
+\usepackage{courier}
+\usepackage[margin=1in]{geometry}
+\usepackage{amsmath}
+\usepackage{hyperref}
+
+\title{Model: name, acronym}
+\author{Author(s) of this sheet: name, surname}
+\date{Last update: month year}
+
+\begin{document}
+
+\maketitle
+
+\section{General description}
+Describe in plain words the objectives of the model, its main input/output variables, its general principles.\\
+Provide key scientific references and documentation (example: \cite{Doe2015}), links to online contents if any (example: \url{https://forge.irstea.fr/projects/bam}), etc.
+
+\section{Key properties}
+
+\begin{description}
+\item[ID] \texttt{"ModelID"}, the ID of the model in BaM.
+
+\item[Input Variables] $N_X=?$
+\begin{enumerate}
+\item Name of input variable 1 $[\rm unit]$: comments.
+\item Name of input variable 2 $[\rm unit]$: comments.
+\item etc.
+\end{enumerate}
+
+\item[Output Variables] $N_Y=?$
+\begin{enumerate}
+\item Name of output variable 1 $[\rm unit]$: comments.
+\item Name of output variable 2 $[\rm unit]$: comments.
+\item etc.
+\end{enumerate}
+
+\item[Parameters] $N_{par}=?$
+\begin{enumerate}
+\item Name of parameter 1 $[\rm unit]$: comments.
+\item Name of parameter 2 $[\rm unit]$: comments.
+\item etc.
+\end{enumerate}
+
+\item[Derived parameters] $N_{d}=?$
+\begin{enumerate}
+\item Name of derived parameter 1 $[\rm unit]$: comments.
+\item Name of derived parameter 2 $[\rm unit]$: comments.
+\item etc.
+\end{enumerate}
+
+\item[State variables] $N_{Z}=?$
+\begin{enumerate}
+\item Name of state variable 1 $[\rm unit]$: comments.
+\item Name of state variable 2 $[\rm unit]$: comments.
+\item etc.
+\end{enumerate}
+
+\item[Xtra information] Explain what kind of extra information is needed to run the model (if any).
+\begin{enumerate}
+\item Use a numbered list if there are several items.
+\item etc.
+\end{enumerate}
+
+\end{description}
+
+\section{Mathematical formulation}
+Provide all formulas behind the model, using equations.
+%
+\begin{equation}
+Y=f(X,\theta)
+\label{eq:formula}
+\end{equation}
+%
+If possible try to provide all needed information to make the model fully reproducible (i.e. re-implementable through other means, using the information contained in this sheet only).\\
+If this is not feasible due to the complexity of the model, provide references \cite{Doe2015} or links to some online content (\url{https://forge.irstea.fr/projects/bam}).\\
+Figures and tables are welcome too!
+%
+\begin{center}
+   \begin{figure} [!htbp]
+    %\includegraphics[width=\textwidth]{Figure1.pdf}
+    \caption{Figure caption}
+    \label{fig:figure}
+   \end{figure}
+ \end{center}
+%
+\begin{table}[!htbp]
+	\centering
+	\begin{tabular}{ccc}
+		\hline
+		C1 & C2 & C3 \\
+		\hline
+		blah & blah & blah \\
+		\hline
+		blah & blah & blah\\
+		\hline
+	\end{tabular}
+	\caption{Table caption}
+	\label{tab:table}
+\end{table}
+%
+
+\section{Configuration in BaM}
+The example below shows a typical configuration file for this model.\\
+%
+\begin{tcolorbox}
+	\begin{tabular}{ll}
+		\texttt{"ID"} & \texttt{! Model ID}\\
+		\texttt{2} & \texttt{! nX: number of input variables}\\
+		\texttt{1} & \texttt{! nY: number of ouput variables}\\
+		\texttt{4} & \texttt{! nPar: number of parameters theta}\\
+		\texttt{"Par1"} & \texttt{! Parameter name}\\
+		\texttt{0.0} & \texttt{! Initial guess}\\
+		\texttt{"Gaussian"} & \texttt{! Prior distribution}\\
+		\texttt{0.0,1.0} & \texttt{! Prior parameters}\\
+		\texttt{"Par2"} & \texttt{! Parameter name}\\
+		\texttt{1.0} & \texttt{! Initial guess}\\
+		\texttt{"LogNormal"} & \texttt{! Prior distribution}\\
+		\texttt{0.0,0.2} & \texttt{! Prior parameters}\\
+		\texttt{"Par3\_gravity"} & \texttt{! Parameter name}\\
+		\texttt{9.81} & \texttt{! Initial guess}\\
+		\texttt{"FIX"} & \texttt{! Prior distribution}\\
+		\texttt{0} & \texttt{! Prior parameters}\\
+		\texttt{"Par4\_variable"} & \texttt{! Parameter name}\\
+		\texttt{-99.99} & \texttt{! Initial guess}\\
+		\texttt{"VAR"} & \texttt{! Prior distribution}\\
+		\texttt{"Config\_Par4\_VAR.txt"} & \texttt{! Prior parameters}\\
+	\end{tabular}
+\end{tcolorbox}
+%
+If an Xtra configuration file is also needed:\\
+%
+\begin{tcolorbox}
+	\begin{tabular}{ll}
+		\texttt{"blahblah"} & \texttt{! meaning of line 1 }\\
+		\texttt{"blahblah"} & \texttt{! meaning of line 2 }\\
+	\end{tabular}
+\end{tcolorbox}
+
+\begin{thebibliography}{00}
+
+\bibitem[Doe et al. (2015)]{Doe2015}
+Doe, J, 2015. Paper Title. Journal name. doi:10.5194/hess-19-2427-2015.
+
+\end{thebibliography}
+
+\end{document}
